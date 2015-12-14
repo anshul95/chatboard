@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+	<head>
+		<title>ChatBoard : Let's draw and chat</title>
+		<link href="/css/bootstrap.min.css" rel="stylesheet">	
+		<link href="/css/bootstrap-reset.css" rel="stylesheet">	
+		<link href="/css/style.css" rel="stylesheet">	
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		<!-- <link href="public/css/font_awesome.min.css" rel="stylesheet">	 -->
+	</head>
+	<body>
+		<div style="margin-top:10px" id="handler_panel">
+			<div class="col-lg-offset-1 col-lg-10">
+				<section class="panel">
+					<header class="panel-heading">
+						<strong>Enter your handler</strong>
+					</header>
+					<div class="panel-body">
+						<form id="handler">
+							<label for="handler" style="float:left; padding: 8px 10px 0 0">Handler : </label>
+							<input class="form-control" name="handler" style="float:left; width:85%; border-radius: 0; color:#797979" autocomplete="off" />
+							<button class="btn btn-sm btn-success" style="float:left; margin-left: 10px">Let's Go</button>
+						</form>
+					</div>
+				</section>
+			</div>
+			<br style="clear:float;" />
+		</div>
+		<div id="chat_box" style="margin-top:10px; display:none">
+			<div class="col-lg-offset-2 col-lg-8">
+				<section class="panel ">
+		          	<header class="panel-heading">
+		          		Let's Chat
+		              	<span class="tools pull-right">
+		                	<a class="fa fa-chevron-down" href="javascript:;"></a>
+		                	<a class="fa fa-times" href="javascript:;"></a>
+		            	</span>
+		          	</header>
+			        
+			        <div class="panel-body profile-activity" id="message"></div>
+
+			        <div>
+			        	<form action="" id="send_msg" class="form-inline" style="padding : 10px 0px 3px 10px ">
+			        		<input id="m"  class="form-control" style="width:80%; border-radius: 0; color:#797979" autocomplete="off" />
+			        		<a class="btn btn-success" data-toggle="modal" href="#board" style="width:9%; border-radius: 0;">
+			        			<span>Draw</span>
+			        		</a>
+			        		<button class="btn btn-sm btn-info" type="submit" style="width:9%; border-radius: 0; font-size: 14px;">
+			        			<b>Send</b>
+		        			</button>
+			        	</form>
+			        </div>
+				</section>
+			</div>
+			<div class="modal fade" id="board" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+	          <div class="modal-dialog modal-lg">
+	              <div class="modal-content">
+	                  	<canvas id="myCanvas">
+	                  		Sorry, your browser does not support HTML5 canvas technology.
+	                  	</canvas>
+	                  	<br style="clear:both;"/>
+	                  	<div style="position:relative; top:434px;">
+	                  		<button type="button" id="erase_all" class="btn btn-danger" style="float:left;">Erase all</botton>
+	                  		<button type="button" id="send_img" class="btn btn-info" style="float:right;">Send</botton>
+	                  	</div>
+	              </div>
+	          </div>
+	      	</div>
+	      </div>
+  <!-- 		<ul id="messages"></ul>
+		<form action="">
+			<input id="m" autocomplete="off" /><button>Send</button>
+		</form>
+ -->
+
+		<script src="/socket.io/socket.io.js"></script> 
+		<script src="/js/jquery.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
+		<script src="/js/index.js"></script>
+		<script>
+			$(document).ready(function(){
+			  	var socket = io();
+			  	var data = {
+			  		handler: "",
+			  		msg: "",
+			  		board_data: null,
+			  		send_img: 0,
+			  		timestamp: null
+			  	};
+			  	var temp = [
+				  	{activity_class: 'blue', arrow_class: 'arrow', handler_color:"#90B4E6"},
+				  	{activity_class: 'alt purple', arrow_class: 'arrow-alt', handler_color:"#B984DC"}
+  				];
+
+			  	var handler = getParameterByName('handler');
+			  	if(handler){
+		    		data.handler = toTitleCase(handler);
+			  		$("#handler_panel").hide();	  	
+			  		$("#chat_box").show();	
+			  	}
+
+			  	$('#send_msg').submit(function(){
+			    	data.msg = $('#m').val();
+			    	socket.emit('chat message', data);
+			    	$('#m').val("")
+			    	return false;
+				});
+
+				socket.on('chat message', function(data_received){
+					var me=0;
+					var html="";
+					if(data_received.handler == data.handler){
+						me = 1;
+					}
+
+					if(data_received.send_img){
+						var img = data_received.board_data;
+
+						html += '<div class="activity '+ temp[me].activity_class +'">';
+						html += '<span><i class="fa fa-user"></i></span>';
+						html += '<div class="activity-desk">';
+						html += 	'<div class="panel" style="min-width:100px">';
+						html += 		'<div class="panel-body">';
+						html += 	        '<div class="'+ temp[me].arrow_class +'"></div>';
+						html += 	        '<div style="display: inline-block; width:63px;"><i class=" fa  fa-clock-o" style="margin-right:4px"></i>';
+						html += 	        '<h5>'+ data_received.timestamp +'</h5></div>';
+						html += 	        '<div style="display: inline-block; color:'+temp[me].handler_color+'">'+ data_received.handler +'</div>';
+						html += 	        '<img src="'+ img +'" style="width:100%"/>';
+						html += 	    '</div>';
+						html += 	'</div>';
+						html += '</div>';
+						html += '</div>';
+				    	$('#message').append(html);
+
+					}else{
+						html += '<div class="activity '+ temp[me].activity_class +'">';
+						html += '<span><i class="fa fa-user"></i></span>';
+						html += '<div class="activity-desk">';
+						html += 	'<div class="panel" style="min-width:100px">';
+						html += 		'<div class="panel-body">';
+						html += 	        '<div class="'+ temp[me].arrow_class +'"></div>';
+						html += 	        '<div style="display: inline-block; width:63px;"><i class=" fa  fa-clock-o" style="margin-right:4px"></i>';
+						html += 	        '<h5>'+ data_received.timestamp +'</h5></div>';
+						html += 	        '<div style="display: inline-block; color:'+temp[me].handler_color+'">'+ data_received.handler +'</div>';
+						html += 	        '<p style="color:#433B3B">'+ data_received.msg +'</p>';
+						html += 	    '</div>';
+						html += 	'</div>';
+						html += '</div>';
+						html += '</div>';
+				    	$('#message').append(html);
+					}
+			  	});
+
+				$("#send_img").on('click', function(){
+					var myCanvas = document.getElementById("myCanvas");
+					var ctx = myCanvas.getContext("2d");
+					
+					data.board_data = myCanvas.toDataURL();
+					data.send_img = 1;
+					socket.emit('chat message', data);
+
+					ctx.clearRect(0, 0, myCanvas.width, myCanvas.height)
+					$('#board').modal('hide');
+
+				});
+				function toTitleCase(str){
+				    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+				}
+				function getParameterByName(name) {
+				    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+				    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+				        results = regex.exec(location.search);
+				    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+				}
+			});
+		</script>			
+	</body>
+</html>
