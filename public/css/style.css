@@ -6184,6 +6184,15 @@ canvas{
 #myCanvas {
     cursor: crosshair;
     position: fixed;
-    width:900px;
-    /*:100%;*/
+}
+
+#color_tray{
+    float:left;
+    margin-left: 20px;
+}
+#color_tray > div{
+    display:inline-block; 
+    width:30px; 
+    height:30px; 
+    cursor:pointer;
 }

@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var tot_con = 0;
 
 app.use(express.static('public'));	
 
@@ -10,7 +11,9 @@ app.get('/', function(req, res){
 });
 	
 io.on('connection', function(socket){
-	console.log('a user connected');
+	tot_con++;
+	console.log('Total Users connected: '+tot_con);
+	io.emit('tot_users', tot_con);
 
 	socket.on('chat message', function(data){
 		date = new Date();
@@ -20,7 +23,9 @@ io.on('connection', function(socket){
 	});
 
   	socket.on('disconnect', function(){
-    	console.log('user disconnected');
+  		tot_con--;
+  		console.log('Total Users remaining: '+tot_con);
+	  	io.emit('tot_users', tot_con);
   	});
 });
 

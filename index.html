@@ -9,6 +9,7 @@
 		<!-- <link href="public/css/font_awesome.min.css" rel="stylesheet">	 -->
 	</head>
 	<body>
+		<div id="tot_users" style="width:60px; height:60px; border-radius: 100%; position:fixed; top:10px; right:10px; background-color: #00A8B3; color:white; padding:5px 0px 0 20px; font-size: 35px; z-index: 999">0</div>
 		<div style="margin-top:10px" id="handler_panel">
 			<div class="col-lg-offset-1 col-lg-10">
 				<section class="panel">
@@ -31,10 +32,6 @@
 				<section class="panel ">
 		          	<header class="panel-heading">
 		          		Let's Chat
-		              	<span class="tools pull-right">
-		                	<a class="fa fa-chevron-down" href="javascript:;"></a>
-		                	<a class="fa fa-times" href="javascript:;"></a>
-		            	</span>
 		          	</header>
 			        
 			        <div class="panel-body profile-activity" id="message"></div>
@@ -42,10 +39,10 @@
 			        <div>
 			        	<form action="" id="send_msg" class="form-inline" style="padding : 10px 0px 3px 10px ">
 			        		<input id="m"  class="form-control" style="width:80%; border-radius: 0; color:#797979" autocomplete="off" />
-			        		<a class="btn btn-success" data-toggle="modal" href="#board" style="width:9%; border-radius: 0;">
+			        		<a class="btn btn-success" data-toggle="modal" href="#board" style="min-width: 60px; width:9%; border-radius: 0;">
 			        			<span>Draw</span>
 			        		</a>
-			        		<button class="btn btn-sm btn-info" type="submit" style="width:9%; border-radius: 0; font-size: 14px;">
+			        		<button class="btn btn-sm btn-info" type="submit" style="min-width: 60px; width:9%; border-radius: 0; font-size: 14px;">
 			        			<b>Send</b>
 		        			</button>
 			        	</form>
@@ -60,22 +57,28 @@
 	                  	</canvas>
 	                  	<br style="clear:both;"/>
 	                  	<div style="position:relative; top:434px;">
-	                  		<button type="button" id="erase_all" class="btn btn-danger" style="float:left;">Erase all</botton>
-	                  		<button type="button" id="send_img" class="btn btn-info" style="float:right;">Send</botton>
+	                  		<button type="button" id="erase_all" class="btn btn-danger col-lg-1" style="float:left; border-radius: 0; margin-left: 10px;">Erase all</button>
+                  			<div id="color_tray" class="col-lg-9">
+                  				<div style="background-color: #FA1D2F" data-color="#FA1D2F" data-size="4"></div>
+                  				<div style="background-color: #FF7F24" data-color="#FF7F24" data-size="4"></div>
+        	    	      		<div style="background-color: #008B8B" data-color="#008B8B" data-size="4"></div>
+		                  		<div style="background-color: #00C78C" data-color="#00C78C" data-size="4"></div>
+				                <div style="background-color: #EE30A7" data-color="#EE30A7" data-size="4"></div>
+				                <div style="background-color: #FFE600" data-color="#FFE600" data-size="4"></div>
+				                <div style="background-color: #000000" data-color="#000000" data-size="4"></div>
+				                <div style="background-color: #FFFFFF; border: 1px solid black" data-color="#FFFFFF" data-size="4"></div>
+							    <div style="padding:10px 10px; font-size: 19px; position:relative; top:-8px;" class="fa fa-eraser" data-color="#FFFFFF" data-size="13"></div>
+                  			</div>
+	                  		<button type="button" id="send_img" class="btn btn-info col-lg-1" style="float:right; border-radius: 0; margin-right: 10px;">Send</button>
 	                  	</div>
 	              </div>
 	          </div>
 	      	</div>
 	      </div>
-  <!-- 		<ul id="messages"></ul>
-		<form action="">
-			<input id="m" autocomplete="off" /><button>Send</button>
-		</form>
- -->
 
-		<script src="/socket.io/socket.io.js"></script> 
 		<script src="/js/jquery.js"></script>
 		<script src="/js/bootstrap.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script> 
 		<script src="/js/index.js"></script>
 		<script>
 			$(document).ready(function(){
@@ -149,7 +152,12 @@
 						html += '</div>';
 				    	$('#message').append(html);
 					}
+					window.scrollTo(0,document.body.scrollHeight);
 			  	});
+
+				socket.on('tot_users', function(tot_users){
+					$('#tot_users').text(tot_users);
+				});
 
 				$("#send_img").on('click', function(){
 					var myCanvas = document.getElementById("myCanvas");
