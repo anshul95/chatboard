@@ -2,7 +2,16 @@
   "name": "chatboard",
   "version": "0.0.1",
   "description": "Chatboard is an chat application where you can chat as well as send your handmade emojis.",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
   "dependencies": {
     "socket.io": "^1.3.7"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anshul95/chatboard"
+  },
+  "license": "MIT"
 }
